@@ -1,1 +1,1 @@
-MongoDB deployer for Supergiant
+MongoDB deployer for Supergiant.
