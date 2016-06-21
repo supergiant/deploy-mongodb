@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"fmt"
 	"os/exec"
 	"strings"
 
@@ -20,5 +21,19 @@ func configureReplicaSet(instances []*client.InstanceResource) error {
 	}
 	rsConf := `{_id: "rs0", members: [` + strings.Join(rsConfMems, ", ") + `]}` // TODO TODO TODO rs name....... param
 
-	return exec.Command("mongo", primaryAddr, "--eval", `'rs.initiate(); rs.reconfig(`+rsConf+`)'`).Run()
+	fmt.Println(strings.Join([]string{"mongo", primaryAddr, "--eval", `'rs.initiate()'`}, " "))
+	out, err := exec.Command("mongo", primaryAddr, "--eval", `'rs.initiate()'`).Output()
+	fmt.Println(string(out))
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(strings.Join([]string{"mongo", primaryAddr, "--eval", `'rs.reconfig(` + rsConf + `)'`}, " "))
+	out, err = exec.Command("mongo", primaryAddr, "--eval", `'rs.reconfig(`+rsConf+`)'`).Output()
+	fmt.Println(string(out))
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
