@@ -7,7 +7,7 @@ func Deploy(appName *string, componentName *string) error {
 	// TODO
 	supergiant.Log.SetLevel("debug")
 
-	sg := supergiant.New("http://api-public.supergiant.svc.cluster.local:8080/v0", "", "", true)
+	sg := supergiant.New("http://api-public.sg-test.svc.cluster.local:8080/v0", "", "", true)
 
 	app, err := sg.Apps().Get(appName)
 	if err != nil {
