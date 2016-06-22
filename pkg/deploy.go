@@ -3,6 +3,9 @@ package pkg
 import supergiant "github.com/supergiant/supergiant/client"
 
 func Deploy(appName *string, componentName *string) error {
+
+	supergiant.Log.SetLevel("debug")
+
 	sg := supergiant.New("http://supergiant-api.supergiant.svc.cluster.local/v0", "", "", true)
 
 	app, err := sg.Apps().Get(appName)
