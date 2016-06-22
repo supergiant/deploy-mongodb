@@ -1,7 +1,6 @@
 package pkg
 
 import (
-	"bytes"
 	"fmt"
 	"os/exec"
 	"strings"
@@ -14,6 +13,8 @@ func configureReplicaSet(instances []*client.InstanceResource) error {
 		return nil
 	}
 
+	fmt.Println("FIND ME")
+
 	primaryAddr := instances[0].Addresses.Internal[0].Address
 
 	var rsConfMems []string
@@ -25,18 +26,11 @@ func configureReplicaSet(instances []*client.InstanceResource) error {
 	cmd := exec.Command("mongo", primaryAddr, "--eval", `'rs.initiate(); rs.reconfig(`+rsConf+`)'`)
 
 	fmt.Println(cmd.Path, strings.Join(cmd.Args, " "))
+	fmt.Println("")
 
-	var out bytes.Buffer
-	var stderr bytes.Buffer
-	cmd.Stdout = &out
-	cmd.Stderr = &stderr
-	err := cmd.Run()
+	out, err := cmd.CombinedOutput()
 
-	fmt.Println("OUTPUT")
-	fmt.Println(out.String())
-
-	fmt.Println("ERR")
-	fmt.Println(stderr.String())
+	fmt.Println(string(out))
 
 	return err
 }
