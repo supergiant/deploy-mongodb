@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"bytes"
 	"fmt"
 	"os/exec"
 	"strings"
@@ -21,19 +22,21 @@ func configureReplicaSet(instances []*client.InstanceResource) error {
 	}
 	rsConf := `{_id: "rs0", members: [` + strings.Join(rsConfMems, ", ") + `]}` // TODO TODO TODO rs name....... param
 
-	fmt.Println(strings.Join([]string{"mongo", primaryAddr, "--eval", `'rs.initiate()'`}, " "))
-	out, err := exec.Command("mongo", primaryAddr, "--eval", `'rs.initiate()'`).Output()
-	fmt.Println(string(out))
-	if err != nil {
-		return err
-	}
+	cmd := exec.Command("mongo", primaryAddr, "--eval", `'rs.initiate(); rs.reconfig(`+rsConf+`)'`)
 
-	fmt.Println(strings.Join([]string{"mongo", primaryAddr, "--eval", `'rs.reconfig(` + rsConf + `)'`}, " "))
-	out, err = exec.Command("mongo", primaryAddr, "--eval", `'rs.reconfig(`+rsConf+`)'`).Output()
-	fmt.Println(string(out))
-	if err != nil {
-		return err
-	}
+	fmt.Println(cmd.Path, strings.Join(cmd.Args, " "))
 
-	return nil
+	var out bytes.Buffer
+	var stderr bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = &stderr
+	err := cmd.Run()
+
+	fmt.Println("OUTPUT")
+	fmt.Println(out.String())
+
+	fmt.Println("ERR")
+	fmt.Println(stderr.String())
+
+	return err
 }
