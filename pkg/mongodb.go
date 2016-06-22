@@ -1,7 +1,6 @@
 package pkg
 
 import (
-	"fmt"
 	"os/exec"
 	"strings"
 
@@ -13,29 +12,14 @@ func configureReplicaSet(instances []*client.InstanceResource) error {
 		return nil
 	}
 
-	fmt.Println("FIND ME")
-
-	primaryAddr := instances[0].Addresses.External[0].Address
-
 	var rsConfMems []string
 	for _, instance := range instances {
 		rsConfMems = append(rsConfMems, `{_id: `+*instance.ID+`, host: "`+instance.Addresses.Internal[0].Address+`"}`)
 	}
 	rsConf := `{_id: "rs0", members: [` + strings.Join(rsConfMems, ", ") + `]}` // TODO TODO TODO rs name....... param
 
-	cmd := exec.Command("mongo", primaryAddr, "--eval", `'rs.initiate(); rs.reconfig(`+rsConf+`)'`)
-
-	fmt.Println(cmd.Path, strings.Join(cmd.Args, " "))
-	fmt.Println("")
-
-	out, err := cmd.CombinedOutput()
-
-	fmt.Println("OUT")
-	fmt.Println(string(out))
-
-	if err != nil {
-		fmt.Println("ERROR", err.Error())
-	}
-
-	return err
+	primaryAddr := instances[0].Addresses.Internal[0].Address
+	cmd := exec.Command("mongo", primaryAddr)
+	cmd.Stdin = strings.NewReader("rs.initiate()\nrs.reconfig(" + rsConf + ")\n")
+	return cmd.Run()
 }
