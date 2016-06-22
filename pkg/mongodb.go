@@ -15,7 +15,7 @@ func configureReplicaSet(instances []*client.InstanceResource) error {
 
 	fmt.Println("FIND ME")
 
-	primaryAddr := instances[0].Addresses.Internal[0].Address
+	primaryAddr := instances[0].Addresses.External[0].Address
 
 	var rsConfMems []string
 	for _, instance := range instances {
@@ -30,7 +30,12 @@ func configureReplicaSet(instances []*client.InstanceResource) error {
 
 	out, err := cmd.CombinedOutput()
 
+	fmt.Println("OUT")
 	fmt.Println(string(out))
+
+	if err != nil {
+		fmt.Println("ERROR", err.Error())
+	}
 
 	return err
 }
