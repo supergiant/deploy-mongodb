@@ -20,6 +20,6 @@ func configureReplicaSet(instances []*client.InstanceResource) error {
 
 	primaryAddr := instances[0].Addresses.Internal[0].Address
 	cmd := exec.Command("mongo", primaryAddr)
-	cmd.Stdin = strings.NewReader("rs.initiate()\nrs.reconfig(" + rsConf + ")\n")
+	cmd.Stdin = strings.NewReader("rs.initiate(); rs.reconfig(" + rsConf + ")\n")
 	return cmd.Run()
 }
